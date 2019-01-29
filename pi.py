@@ -14,12 +14,12 @@ class box():
 
 
 class platform():
-    def __init__(self, timeStep):
+    def __init__(self, timeStep, digits):
         '''This timestep detirmines how finely the movement
             is simulated'''
         self.timeStep = timeStep #In fractions of a second
-        self.boxA = box(inMass = 1.0, inX = 1.0, inVel = 1.0)
-        self.boxB = box(inMass = 2.0, inX = 3, inVel= 0.0)
+        self.boxA = box(inMass = 1.0, inX = 1.0, inVel = 0.0)
+        self.boxB = box(inMass = 100.0 ** (digits - 1), inX = 5.0, inVel= -1.0)
         self.collisions = 0
     
     def stepOnce(self):
@@ -35,7 +35,7 @@ class platform():
             self.collisions += 1
             mA = float(self.boxA.mass)
             mB = float(self.boxB.mass)
-            print("Collision")
+            #print("Collision")
 
             #These equations calculate the new velocity of both boxes post-collision
             newAVel = (((2* mB)/(mB + mA)) * self.boxB.vel) - ((mB - mA)/(mB + mA) * self.boxA.vel)
@@ -50,6 +50,7 @@ class platform():
             #located at x=0
             self.boxA.vel = -self.boxA.vel
             self.collisions += 1
+            
 
 
 
@@ -61,9 +62,35 @@ class platform():
         print("Collisions: " + str(self.collisions))
         print("#############")
 
+    def simulate(self, duration):
+        iterations = float(duration) / float(self.timeStep)
 
-newPlatform = platform(0.1)
+        for i in range(0, int(iterations)):
+            self.stepOnce()
+        
+        print(self.collisions)
 
-for i in range(1, 100):
-    newPlatform.getPositions()
-    newPlatform.stepOnce()
+    def autoSimulate(self, buffer):
+        
+        turnsSinceLastCol = 0
+
+        while turnsSinceLastCol <= buffer:
+            colBefore = self.collisions
+            self.stepOnce()
+            colAfter = self.collisions
+
+            if colBefore != colAfter:
+                turnsSinceLastCol = 0
+            else:
+                turnsSinceLastCol += 1
+
+        print(self.collisions)
+    
+newPlatform = platform(0.001, 8)
+
+newPlatform.simulate(100000)
+#newPlatform.autoSimulate(1000000000)
+
+
+#3.1415926535
+#100 ^( digits - 1)
