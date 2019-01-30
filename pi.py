@@ -135,7 +135,7 @@ def parseInput():
         print("--h     |     brings up this menu")
         print()
     if '--g' in sys.argv:
-        if sys.argv[sys.argv.index("--g") + 1].lower() = "false":
+        if sys.argv[sys.argv.index("--g") + 1].lower() == "false":
             environment.graphicsEnabled = False
 
     if '--m' in sys.argv:
