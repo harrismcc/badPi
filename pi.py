@@ -1,5 +1,6 @@
 import time
 import sys
+import simpleGraphics
 class box():
     '''This object is the simulated mass that "bounces" off
         of another box in a specific way to calculate digits 
@@ -13,7 +14,7 @@ class box():
 
 
 class platform():
-    def __init__(self, digits, timeStep=1):
+    def __init__(self, digits, timeStep=1, graphics = True):
         '''This timestep detirmines how finely the movement
             is simulated'''
         self.timeStep = timeStep #In fractions of a second
@@ -21,6 +22,7 @@ class platform():
         self.boxB = box(inMass = 100.0 ** (digits - 1), inX = 5.0, inVel= -1.0)
         self.collisions = 0
         self.digits = digits
+        self.graphicsEnabled = graphics
     
     def stepOnce(self):
         '''This function moves physics along one 'tick' 
@@ -79,8 +81,10 @@ class platform():
             if i % (iterations / 100) <= 100.0: 
                 elapsed = time.time() - start
                 currentPercent = (i / iterations) * 100
-                #This is the "running display" of percent and time elapsed
-                print(" " + str("%.1f" % currentPercent) + "%, " + str("%.1f" % elapsed) + "s ", end="\r", flush=True)
+                if self.graphicsEnabled:
+                    print(" " + str("%.1f" % currentPercent) + "%, " + str("%.1f" % elapsed) + "s     " + 
+                    simpleGraphics.gEngine.stepAnimation(), end="\r", flush=True)
+                #print(testGraphics.gEngine.stepAnimation(), end="\r", flush=True)
 
             self.stepOnce()
         end = time.time()
@@ -103,26 +107,42 @@ class platform():
 
 
 def parseInput():
+    ''' This allows the entire program to run in a
+        comfortable way from the command line. It
+        is a bit dinky. Transition to Click coming
+
+    '''
+
+    try:
+        digits = int(sys.argv[1])
+        environment = platform(digits)
+    except: 
+        print("You need to add a number of digits to calculate")
+        print("e.g.     >> python pi.py 5")
+        digits = input("Enter number of digits here: ")
+        environment = platform(int(digits))
 
 
-    if 'help' in sys.argv or len(sys.argv) <= 1 or '-h' in sys.argv:
+    if 'help' in sys.argv or len(sys.argv) <= 1 or '--h' in sys.argv:
         print()
         print("Welcome to the worst way to calculate pi!")
         print("Add the number of digits you would like as an argument")
         print("e.g.    >> python pi.py 5")
-        print("or      >> python pi.py 5 -m 10000")
+        print("or      >> python pi.py 5 --m 10000")
         print()
         print('Arguments')
-        print("-m     |     allows you to manually specify number of frames")
-        print("-h     |     brings up this menu")
+        print("--m     |     allows you to manually specify number of frames")
+        print("--h     |     brings up this menu")
         print()
-    elif '--m' in sys.argv:
-        digits = int(sys.argv[1])
-        environment = platform(digits)
+    if '--g' in sys.argv:
+        if sys.argv[sys.argv.index("--g") + 1].lower() = "false":
+            environment.graphicsEnabled = False
+
+    if '--m' in sys.argv:
         environment.simulate(sys.argv[sys.argv.index("--m") + 1])
+
     else:
-        digits = int(sys.argv[1])
-        environment = platform(digits)
+        
         environment.autoSimulate()
 
 parseInput()
