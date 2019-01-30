@@ -15,3 +15,5 @@ Additionally, you can run it with no arguments or with the -h flag to get the he
 ```
     python py.py <number of digits> -m <number of frames>
 ```
+
+![alt text](https://raw.githubusercontent.com/harrismcc/badPi/master/exampleRun.gif)
