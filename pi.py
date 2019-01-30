@@ -1,6 +1,5 @@
-import math
-
-
+import time
+import sys
 class box():
     '''This object is the simulated mass that "bounces" off
         of another box in a specific way to calculate digits 
@@ -14,13 +13,14 @@ class box():
 
 
 class platform():
-    def __init__(self, timeStep, digits):
+    def __init__(self, digits, timeStep=1):
         '''This timestep detirmines how finely the movement
             is simulated'''
         self.timeStep = timeStep #In fractions of a second
         self.boxA = box(inMass = 1.0, inX = 1.0, inVel = 0.0)
         self.boxB = box(inMass = 100.0 ** (digits - 1), inX = 5.0, inVel= -1.0)
         self.collisions = 0
+        self.digits = digits
     
     def stepOnce(self):
         '''This function moves physics along one 'tick' 
@@ -56,41 +56,73 @@ class platform():
 
     def getPositions(self):
         '''Getter that returns all objects in the space
-            and their positions'''
+            and their positions. Mostly for debugging
+        '''
         print("BoxA: " +  str(self.boxA.x))
         print("BoxB: " + str(self.boxB.x))
         print("Collisions: " + str(self.collisions))
         print("#############")
 
     def simulate(self, duration):
+        ''' This function does the simulation for the amount of
+            time specified (duration) and for the proper amount
+            of frames.
+            returns: number of collisions
+
+        '''
         iterations = float(duration) / float(self.timeStep)
+        print("Currently calculating " + str(iterations) + " frames")
+        start = time.time()
 
         for i in range(0, int(iterations)):
+ 
+            if i % (iterations / 100) <= 100.0: 
+                elapsed = time.time() - start
+                currentPercent = (i / iterations) * 100
+                #This is the "running display" of percent and time elapsed
+                print(" " + str("%.1f" % currentPercent) + "%, " + str("%.1f" % elapsed) + "s ", end="\r", flush=True)
+
             self.stepOnce()
-        
-        print(self.collisions)
+        end = time.time()
+        finalPi = self.collisions
+        print("Result: " + str(finalPi))
+        print("Time Elapsed: " + str("%.1f" %  (end - start)) + "s")
+        return finalPi
 
-    def autoSimulate(self, buffer):
-        
-        turnsSinceLastCol = 0
-
-        while turnsSinceLastCol <= buffer:
-            colBefore = self.collisions
-            self.stepOnce()
-            colAfter = self.collisions
-
-            if colBefore != colAfter:
-                turnsSinceLastCol = 0
-            else:
-                turnsSinceLastCol += 1
-
-        print(self.collisions)
+    def autoSimulate(self):
+        ''' This function runs the simulate() function
+            the correct amount of time for the number
+            of digits. This helps keep total time
+            down.
+        '''
+        #This equation was found mostly through trial and error
+        iterations = 4 * (10 ** (self.digits - 1))
+        return self.simulate(iterations)
     
-newPlatform = platform(0.001, 8)
-
-newPlatform.simulate(100000)
-#newPlatform.autoSimulate(1000000000)
 
 
-#3.1415926535
-#100 ^( digits - 1)
+
+def parseInput():
+
+
+    if 'help' in sys.argv or len(sys.argv) <= 1 or '-h' in sys.argv:
+        print()
+        print("Welcome to the worst way to calculate pi!")
+        print("Add the number of digits you would like as an argument")
+        print("e.g.    >> python pi.py 5")
+        print("or      >> python pi.py 5 -m 10000")
+        print()
+        print('Arguments')
+        print("-m     |     allows you to manually specify number of frames")
+        print("-h     |     brings up this menu")
+        print()
+    elif '--m' in sys.argv:
+        digits = int(sys.argv[1])
+        environment = platform(digits)
+        environment.simulate(sys.argv[sys.argv.index("--m") + 1])
+    else:
+        digits = int(sys.argv[1])
+        environment = platform(digits)
+        environment.autoSimulate()
+
+parseInput()
