@@ -1,6 +1,10 @@
 import time
 import sys
 import simpleGraphics
+
+
+
+
 class box():
     '''This object is the simulated mass that "bounces" off
         of another box in a specific way to calculate digits 
@@ -82,8 +86,10 @@ class platform():
                 elapsed = time.time() - start
                 currentPercent = (i / iterations) * 100
                 if self.graphicsEnabled:
+                    
                     print(" " + str("%.1f" % currentPercent) + "%, " + str("%.1f" % elapsed) + "s     " + 
                     simpleGraphics.gEngine.stepAnimation(), end="\r", flush=True)
+
                 #print(testGraphics.gEngine.stepAnimation(), end="\r", flush=True)
 
             self.stepOnce()
@@ -97,7 +103,7 @@ class platform():
         ''' This function runs the simulate() function
             the correct amount of time for the number
             of digits. This helps keep total time
-            down.
+            down.a
         '''
         #This equation was found mostly through trial and error
         iterations = 4 * (10 ** (self.digits - 1))
@@ -105,44 +111,3 @@ class platform():
     
 
 
-
-def parseInput():
-    ''' This allows the entire program to run in a
-        comfortable way from the command line. It
-        is a bit dinky. Transition to Click coming
-
-    '''
-
-    try:
-        digits = int(sys.argv[1])
-        environment = platform(digits)
-    except: 
-        print("You need to add a number of digits to calculate")
-        print("e.g.     >> python pi.py 5")
-        digits = input("Enter number of digits here: ")
-        environment = platform(int(digits))
-
-
-    if 'help' in sys.argv or len(sys.argv) <= 1 or '--h' in sys.argv:
-        print()
-        print("Welcome to the worst way to calculate pi!")
-        print("Add the number of digits you would like as an argument")
-        print("e.g.    >> python pi.py 5")
-        print("or      >> python pi.py 5 --m 10000")
-        print()
-        print('Arguments')
-        print("--m     |     allows you to manually specify number of frames")
-        print("--h     |     brings up this menu")
-        print()
-    if '--g' in sys.argv:
-        if sys.argv[sys.argv.index("--g") + 1].lower() == "false":
-            environment.graphicsEnabled = False
-
-    if '--m' in sys.argv:
-        environment.simulate(sys.argv[sys.argv.index("--m") + 1])
-
-    else:
-        
-        environment.autoSimulate()
-
-parseInput()
